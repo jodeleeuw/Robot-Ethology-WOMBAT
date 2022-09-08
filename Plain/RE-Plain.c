@@ -9,27 +9,28 @@ Authors: 		Nick Livingston (old KIPR Link version), Duc Dang (new KIPR Wombat ve
 Date:			August 2022
 */
 
-#include <kipr/wombat.h>
-#include <stdlib.h>	 //import for min, max, etc.
-#include <stdbool.h> //import for boolean support
+// *** Import Libraries *** //
+//#include <kipr/wombat.h> 					// KIPR Wombat native library
+#include <stdlib.h>	 						// library for general purpose functions
+#include <stdbool.h> 						// library for boolean support
 
-// set pin address for hardware
-#define RIGHT_IR_PIN 0 // analog sensors (IRs, photos)
+// *** Define PIN Address *** //
+#define RIGHT_IR_PIN 0 
 #define LEFT_IR_PIN 1
 #define RIGHT_PHOTO_PIN 2
-#define LEFT_PHOTO_PIN 3
+#define LEFT_PHOTO_PIN 3 					// analog sensors (IRs, photos)
 
-#define FRONT_BUMP_RIGHT_PIN 0 // digital sensors (bumpers)
+#define FRONT_BUMP_RIGHT_PIN 0 
 #define FRONT_BUMP_LEFT_PIN 1
 #define BACK_BUMP_RIGHT_PIN 2
-#define BACK_BUMP_LEFT_PIN 3
+#define BACK_BUMP_LEFT_PIN 3 				// digital sensors (bumpers)
 
-#define RIGHT_MOTOR_PIN 0 // servos
-#define LEFT_MOTOR_PIN 1
+#define RIGHT_MOTOR_PIN 0 
+#define LEFT_MOTOR_PIN 1 					// servos
 
-//*************************************************** Function Declarations ***********************************************************//
+// *** Function Declarations *** //
 // CHECKS
-void read_sensors();							 // function to read all sensor values and save to global vars
+void read_sensors();							 // read all sensor values and save to global variables
 bool is_above_distance_threshold(int threshold); // return true if one and only one IR sensor is above the specified threshold
 bool is_above_photo_differential(int threshold); // return true if the absolute difference between photo sensor values is above the specified threshold
 bool is_front_bump();							 // return true if one of the front bumpers was hit
@@ -53,7 +54,7 @@ void drive(float left, float right, float delay_seconds); // drive with a certai
 // HELPER FUNCTIONS
 float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high); // remap a value from a source range to a new range
 
-//*************************************************** Variable Definitions ****************************************************/
+// *** Variable Definitions *** //
 
 // global variables to store all current sensor values accessible to all functions and updated by the "read_sensors" function
 int right_photo_value, left_photo_value, right_ir_value, left_ir_value, front_bump_right_value, front_bump_left_value, back_bump_right_value, back_bump_left_value;
@@ -67,16 +68,16 @@ int photo_threshold = 150;	   // the absolute difference between photo sensor re
 int timer_duration = 500;	  // the time in milliseconds to wait between calling action commands.  This value is changed by each drive command called by actions
 unsigned long start_time = 0; // store the system time each time we start an action so we can see if our time has elapsed without a blocking delay
 
-//*************************************************** Function Definitions ****************************************************//
+// *** Function Definitions *** //
 
-//================================================================================================================//
-//=======================================================MAIN=====================================================//
-//================================================================================================================//
+//==================================//
+//===============MAIN===============//
+//==================================//
 int main()
 {
-	enable_servo(LEFT_MOTOR_PIN); // initialize both motors and set speed to zero
+	enable_servo(LEFT_MOTOR_PIN); 
 	enable_servo(RIGHT_MOTOR_PIN);
-	drive(0.0, 0.0, 1.0);
+	drive(0.0, 0.0, 1.0); 					// initialize both motors and set speed to zero
 
 	while (true)
 	{ // this is an infinite loop (true is always true!)
@@ -91,9 +92,10 @@ int main()
 			{
 				escape_front();
 			}
-			// else if(is_back_bump()){
-			//	escape_back();
-			// }
+			else if (is_back_bump())
+			{
+				escape_back();
+			}
 			else if (is_above_distance_threshold(avoid_threshold))
 			{
 				avoid();
@@ -130,23 +132,23 @@ void read_sensors()
 /******************************************************/
 bool is_above_photo_differential(int threshold)
 {
-	int photo_difference = left_photo_value - right_photo_value; // get the difference between the photo values
-	return (abs(photo_difference) > threshold); // returns true if the absolute difference between photo sensors is greater than the threshold, otherwise false
+	int photo_difference = abs(left_photo_value - right_photo_value); // get the difference between the photo values
+	return photo_difference > threshold;							  // returns true if the absolute difference between photo sensors is greater than the threshold, otherwise false
 }
 /******************************************************/
 bool is_above_distance_threshold(int threshold)
 {
-	return (left_ir_value > threshold || right_ir_value > threshold); // returns true if one (exclusive) ir value is above the threshold, otherwise returns false
+	return (left_ir_value > threshold || right_ir_value > threshold); // returns true if one (exclusive) IR value is above the threshold, otherwise false
 }
 /******************************************************/
 bool is_front_bump()
 {
-	return (front_bump_left_value == 0 || front_bump_right_value == 0); // return true if our bump value is less than or equal to 400
+	return (front_bump_left_value == 0 || front_bump_right_value == 0); // return true if one of the front bump values is 0, otherwise false
 }
 /******************************************************/
 bool is_back_bump()
 {
-	return (back_bump_left_value == 0 || back_bump_right_value == 0); // return true if our bump value is less than or equal to 400
+	return (back_bump_left_value == 0 || back_bump_right_value == 0); // return true if one of the back bump values is 0, otherwise false
 }
 
 //================================================================================================================//
