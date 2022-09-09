@@ -1,5 +1,5 @@
 /*
-Vassar Cognitive Science - Robot Novel Behavior
+Vassar Cognitive Science - Robot Novel Behavior (Plain version)
 
 This program operates a kipr-wombat-based robot (equipped with analog photo, ir, contact sensors) with a specified subsumption hierarchy.
 
@@ -9,31 +9,30 @@ Authors: 		Nick Livingston (old KIPR Link version), Duc Dang (new KIPR Wombat ve
 Date:			August 2022
 */
 
-
 // *** Import Libraries *** //
 
-#include <kipr/wombat.h> 					// KIPR Wombat native library
-#include <stdlib.h>	 						// library for general purpose functions
-#include <stdbool.h> 						// library for boolean support
+#include <kipr/wombat.h> // KIPR Wombat native library
+#include <stdlib.h>		 // library for general purpose functions
+#include <stdbool.h>	 // library for boolean support
 
 // *** Define PIN Address *** //
 
-#define RIGHT_IR_PIN 0 
+#define RIGHT_IR_PIN 0
 #define LEFT_IR_PIN 1
 #define RIGHT_PHOTO_PIN 2
-#define LEFT_PHOTO_PIN 3 					// analog sensors (IRs, photos)
+#define LEFT_PHOTO_PIN 3 // analog sensors (IRs, photos)
 
-#define FRONT_BUMP_RIGHT_PIN 0 
+#define FRONT_BUMP_RIGHT_PIN 0
 #define FRONT_BUMP_LEFT_PIN 1
 #define BACK_BUMP_RIGHT_PIN 2
-#define BACK_BUMP_LEFT_PIN 3 				// digital sensors (bumpers)
+#define BACK_BUMP_LEFT_PIN 3 // digital sensors (bumpers)
 
-#define RIGHT_MOTOR_PIN 0 
-#define LEFT_MOTOR_PIN 1 					// servos
+#define RIGHT_MOTOR_PIN 0
+#define LEFT_MOTOR_PIN 1 // servos
 
 // *** Function Declarations *** //
 
-// CHECKS
+// PERCEPTION FUNCTIONS
 void read_sensors();							 // read all sensor values and save to global variables
 bool is_above_distance_threshold(int threshold); // return true if one and only one IR sensor is above the specified threshold
 bool is_above_photo_differential(int threshold); // return true if the absolute difference between photo sensor values is above the specified threshold
@@ -41,7 +40,7 @@ bool is_front_bump();							 // return true if one of the front bumpers was hit
 bool is_back_bump();							 // return true if one of the back bumpers was hit
 bool timer_elapsed();							 // return true if our timer has elapsed
 
-// ACTIONS
+// ACTION FUNCTIONS
 void escape_front();
 void escape_back();
 void seek_light();
@@ -53,10 +52,11 @@ void cruise_arc();
 void stop();
 
 // MOTOR CONTROL
-void drive(float left, float right, float delay_seconds); // drive with the specified left and right motor speed for a number of seconds
+void drive(float left, float right, float delay_seconds); // drive with the specified left and right motor speeds for a number of seconds
 
 // HELPER FUNCTIONS
-float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high); // remap a value from a source range to a new range
+float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high);
+// remap a value from a source range to a new range
 
 // *** Variable Definitions *** //
 
@@ -69,7 +69,7 @@ int approach_threshold = 1600; // the absolute difference between IR readings ha
 int photo_threshold = 150;	   // the absolute difference between photo sensor readings has to be above this for seek light/dark actions
 
 // timer
-int timer_duration = 500;	  // the time in milliseconds to wait between calling action commands.  This value is changed by each drive command called by actions
+int timer_duration = 500;	  // the time in milliseconds to wait between calling action commands, changed by each drive command called by actions
 unsigned long start_time = 0; // store the system time each time we start an action so we can see if our time has elapsed without a blocking delay
 
 // *** Function Definitions *** //
@@ -80,17 +80,17 @@ unsigned long start_time = 0; // store the system time each time we start an act
 
 int main()
 {
-	enable_servo(LEFT_MOTOR_PIN); 
+	enable_servo(LEFT_MOTOR_PIN);
 	enable_servo(RIGHT_MOTOR_PIN);
-	drive(0.0, 0.0, 1.0); 					// initialize both motors and set speed to zero
+	drive(0.0, 0.0, 1.0); // initialize both motors and set speed to zero
 
-	while (true) 							// infinite loop (true is always true!)
-	{ 
+	while (true) // infinite loop (true is always true!)
+	{
 
-		read_sensors(); 					// read all sensor values and set to global variables
+		read_sensors(); // read all sensor values and set to global variables
 
-		if (timer_elapsed()) 				// any time a drive message is called, the timer is updated; this should always return true until it is called again
-		{ 
+		if (timer_elapsed()) // any time a drive message is called, the timer is updated; this should always return true until it is called again
+		{
 			// subsumption hierarchy:  front, back, avoid, seek light, cruise straight
 			if (is_front_bump())
 			{
@@ -114,7 +114,7 @@ int main()
 			}
 		}
 	}
-	return 0; 								// due to infinite while loop, we will never get here
+	return 0; // due to infinite while loop, we will never get here
 }
 
 //========================================//
@@ -123,8 +123,8 @@ int main()
 
 void read_sensors()
 {
-	right_photo_value = -analog_et(RIGHT_PHOTO_PIN);		// read the photo sensor at RIGHT_PHOTO_PIN
-	left_photo_value = -analog_et(LEFT_PHOTO_PIN);			// read the photo sensor at LEFT_PHOTO_PIN
+	right_photo_value = analog_et(RIGHT_PHOTO_PIN);			// read the photo sensor at RIGHT_PHOTO_PIN; *** NOTE: greater value means less light ***
+	left_photo_value = analog_et(LEFT_PHOTO_PIN);			// read the photo sensor at LEFT_PHOTO_PIN; *** NOTE: greater value means less light ***
 	right_ir_value = analog_et(RIGHT_IR_PIN);				// read the IR sensor at RIGHT_IR_PIN
 	left_ir_value = analog_et(LEFT_IR_PIN);					// read the IR sensor at LEFT_IR_PIN
 	front_bump_right_value = digital(FRONT_BUMP_RIGHT_PIN); // read the bumper at FRONT_BUMP_RIGHT_PIN
@@ -135,13 +135,14 @@ void read_sensors()
 
 bool is_above_photo_differential(int threshold)
 {
-	int photo_difference = abs(left_photo_value - right_photo_value); // get the difference between the photo values
+	int photo_difference = abs(right_photo_value - left_photo_value); // get the difference between the photo values
 	return photo_difference > threshold;							  // returns true if the absolute difference between photo sensors is greater than the threshold, otherwise false
 }
 
 bool is_above_distance_threshold(int threshold)
 {
-	return (left_ir_value > threshold || right_ir_value > threshold) && !(left_ir_value > threshold && right_ir_value > threshold); // returns true if one (exclusive) IR value is above the threshold, otherwise false
+	return (left_ir_value > threshold || right_ir_value > threshold) && !(left_ir_value > threshold && right_ir_value > threshold);
+	// returns true if one (exclusive) IR value is above the threshold, otherwise false
 }
 
 bool is_front_bump()
@@ -160,16 +161,17 @@ bool is_back_bump()
 
 void drive(float left, float right, float delay_seconds)
 {
-	// 850 is full motor speed clockwise, 1050 is stopped,  1250 is full motor speed counterclockwise
-	// servo is stopped from ~1044 to 1055
+	// 850 is full motor speed clockwise, 1250 is full motor speed counterclockwise
+	// Servo is stopped from ~1044 to 1055
+
 	float left_speed = map(left, -1.0, 1.0, 0, 2047); // call the map function to map our speed (set between -1 and 1) to the appropriate range of motor values
 	float right_speed = map(right, -1.0, 1.0, 2047, 0);
 
 	timer_duration = (int)(delay_seconds * 1000.0); // multiply our desired time in seconds by 1000 to get milliseconds and update this global variable
 	start_time = systime();							// update our start time to reflect the time we start driving (in ms)
 
-	set_servo_position(LEFT_MOTOR_PIN, left_speed); // set the servos to run at the mapped speed
-	set_servo_position(RIGHT_MOTOR_PIN, right_speed);
+	set_servo_position(LEFT_MOTOR_PIN, left_speed);
+	set_servo_position(RIGHT_MOTOR_PIN, right_speed); // set the servos to run at the mapped speed
 }
 
 void cruise_straight()
@@ -215,7 +217,7 @@ void seek_light()
 {
 	float left_servo;
 	float right_servo;
-	int photo_difference = left_photo_value - right_photo_value;
+	int photo_difference = right_photo_value - left_photo_value;
 	if (abs(photo_difference) > photo_threshold)
 	{
 		int multiplier = (photo_difference > 0) ? 1 : -1;
@@ -229,7 +231,7 @@ void seek_dark()
 {
 	float left_servo;
 	float right_servo;
-	int photo_difference = left_photo_value - right_photo_value;
+	int photo_difference = right_photo_value - left_photo_value;
 	if (abs(photo_difference) > photo_threshold)
 	{
 		int multiplier = (photo_difference > 1) ? -1 : 1;
@@ -275,5 +277,6 @@ bool timer_elapsed()
 
 float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high)
 {
-	return target_range_low + ((value - start_range_low) / (start_range_high - start_range_low)) * (target_range_high - target_range_low); // remap a value from a source range to a new range
+	return target_range_low + ((value - start_range_low) / (start_range_high - start_range_low)) * (target_range_high - target_range_low);
+	// remap a value from a source range to a new range
 }
