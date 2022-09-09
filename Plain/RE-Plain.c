@@ -73,6 +73,7 @@ unsigned long start_time = 0; // store the system time each time we start an act
 //==================================//
 //===============MAIN===============//
 //==================================//
+
 int main()
 {
 	enable_servo(LEFT_MOTOR_PIN); 
@@ -112,9 +113,10 @@ int main()
 	return 0; 								// due to infinite while loop, we will never get here
 }
 
-//================================================================================================================//
-//====================================================PERCEPTION==================================================//
-//================================================================================================================//
+//========================================//
+//===============PERCEPTION===============//
+//========================================//
+
 void read_sensors()
 {
 	right_photo_value = -analog_et(RIGHT_PHOTO_PIN);		// read the photo sensor at RIGHT_PHOTO_PIN
@@ -127,31 +129,31 @@ void read_sensors()
 	back_bump_left_value = digital(BACK_BUMP_LEFT_PIN);		// read the bumper at BACK_BUMP_LEFT_PIN'
 }
 
-/******************************************************/
 bool is_above_photo_differential(int threshold)
 {
 	int photo_difference = abs(left_photo_value - right_photo_value); // get the difference between the photo values
 	return photo_difference > threshold;							  // returns true if the absolute difference between photo sensors is greater than the threshold, otherwise false
 }
-/******************************************************/
+
 bool is_above_distance_threshold(int threshold)
 {
 	return (left_ir_value > threshold || right_ir_value > threshold) && !(left_ir_value > threshold && right_ir_value > threshold); // returns true if one (exclusive) IR value is above the threshold, otherwise false
 }
-/******************************************************/
+
 bool is_front_bump()
 {
 	return (front_bump_left_value == 0 || front_bump_right_value == 0); // return true if one of the front bump values is 0, otherwise false
 }
-/******************************************************/
+
 bool is_back_bump()
 {
 	return (back_bump_left_value == 0 || back_bump_right_value == 0); // return true if one of the back bump values is 0, otherwise false
 }
 
-//================================================================================================================//
-//========================================================ACTION==================================================//
-//================================================================================================================//
+//====================================//
+//===============ACTION===============//
+//====================================//
+
 void drive(float left, float right, float delay_seconds)
 {
 	// 850 is full motor speed clockwise, 1050 is stopped,  1250 is full motor speed counterclockwise
@@ -165,22 +167,22 @@ void drive(float left, float right, float delay_seconds)
 	set_servo_position(LEFT_MOTOR_PIN, left_speed); // set the servos to run at the mapped speed
 	set_servo_position(RIGHT_MOTOR_PIN, right_speed);
 }
-/******************************************************/
+
 void cruise_straight()
 {
 	drive(0.50, 0.50, 0.5);
 }
-/******************************************************/
+
 void cruise_arc()
 {
 	drive(0.25, 0.4, 0.5);
 }
-/******************************************************/
+
 void stop()
 {
 	drive(0.0, 0.0, 0.25);
 }
-/******************************************************/
+
 void escape_front()
 {
 	if (front_bump_left_value == 0)
@@ -192,7 +194,7 @@ void escape_front()
 		drive(-0.90, -0.0, 1);
 	}
 }
-/******************************************************/
+
 void escape_back()
 {
 	if (back_bump_left_value == 0)
@@ -204,7 +206,7 @@ void escape_back()
 		drive(0.10, 0.9, 1);
 	}
 }
-/******************************************************/
+
 void seek_light()
 {
 	float left_servo;
@@ -212,14 +214,13 @@ void seek_light()
 	int photo_difference = left_photo_value - right_photo_value;
 	if (abs(photo_difference) > photo_threshold)
 	{
-		// if(photo_difference > photo_max) photo_difference = (int)photo_max;
 		int multiplier = (photo_difference > 0) ? 1 : -1;
 		right_servo = 0.2 * multiplier;
 		left_servo = -right_servo;
 	}
 	drive(left_servo, right_servo, 0.25);
 }
-/******************************************************/
+
 void seek_dark()
 {
 	float left_servo;
@@ -233,7 +234,7 @@ void seek_dark()
 	}
 	drive(left_servo, right_servo, 0.25);
 }
-/******************************************************/
+
 void avoid()
 {
 	if (left_ir_value > avoid_threshold)
@@ -246,7 +247,7 @@ void avoid()
 		drive(-0.5, 0.5, 0.1);
 	}
 }
-/******************************************************/
+
 void approach()
 {
 	if (left_ir_value > approach_threshold)
@@ -259,14 +260,15 @@ void approach()
 	}
 }
 
-//================================================================================================================//
-//========================================================HELPERS=================================================//
-//================================================================================================================//
+//=====================================//
+//===============HELPERS===============//
+//=====================================//
+
 bool timer_elapsed()
 {
 	return (systime() > (start_time + timer_duration)); // return true if the current time is greater than our start time plus timer duration
 }
-/******************************************************/
+
 float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high)
 {
 	return target_range_low + ((value - start_range_low) / (start_range_high - start_range_low)) * (target_range_high - target_range_low); // remap a value from a source range to a new range
