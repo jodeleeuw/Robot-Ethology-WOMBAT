@@ -1,4 +1,4 @@
-/**
+/*
 Vassar Cognitive Science - Robot Novel Behavior
 
 This program operates a kipr-wombat-based robot (equipped with analog photo, ir, contact sensors) with a specified subsumption hierarchy.
@@ -49,7 +49,7 @@ void cruise_arc();
 void stop();
 
 // MOTOR CONTROL
-void drive(float left, float right, float delay_seconds); // drive with a certain motor speed for a number of seconds
+void drive(float left, float right, float delay_seconds); // drive with the specified left and right motor speed for a number of seconds
 
 // HELPER FUNCTIONS
 float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high); // remap a value from a source range to a new range
@@ -79,14 +79,13 @@ int main()
 	enable_servo(RIGHT_MOTOR_PIN);
 	drive(0.0, 0.0, 1.0); 					// initialize both motors and set speed to zero
 
-	while (true)
-	{ // this is an infinite loop (true is always true!)
+	while (true) 							// infinite loop (true is always true!)
+	{ 
 
-		read_sensors(); // read all sensors and set global variables of their readouts
+		read_sensors(); 					// read all sensor values and set to global variables
 
-		if (timer_elapsed())
-		{ // any time a drive message is called, the timer is updated.  Until it is called again this should always return true
-
+		if (timer_elapsed()) 				// any time a drive message is called, the timer is updated; this should always return true until it is called again
+		{ 
 			// subsumption hierarchy:  front, back, avoid, seek light, cruise straight
 			if (is_front_bump())
 			{
@@ -108,10 +107,9 @@ int main()
 			{
 				cruise_straight();
 			}
-		} // end if timer elapsed
-	}	  // end while true
-
-	return 0; // due to infinite while loop, we will never get here
+		}
+	}
+	return 0; 								// due to infinite while loop, we will never get here
 }
 
 //================================================================================================================//
@@ -138,7 +136,7 @@ bool is_above_photo_differential(int threshold)
 /******************************************************/
 bool is_above_distance_threshold(int threshold)
 {
-	return (left_ir_value > threshold || right_ir_value > threshold); // returns true if one (exclusive) IR value is above the threshold, otherwise false
+	return (left_ir_value > threshold || right_ir_value > threshold) && !(left_ir_value > threshold && right_ir_value > threshold); // returns true if one (exclusive) IR value is above the threshold, otherwise false
 }
 /******************************************************/
 bool is_front_bump()
@@ -271,5 +269,5 @@ bool timer_elapsed()
 /******************************************************/
 float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high)
 {
-	return target_range_low + ((value - start_range_low) / (start_range_high - start_range_low)) * (target_range_high - target_range_low);
+	return target_range_low + ((value - start_range_low) / (start_range_high - start_range_low)) * (target_range_high - target_range_low); // remap a value from a source range to a new range
 }
