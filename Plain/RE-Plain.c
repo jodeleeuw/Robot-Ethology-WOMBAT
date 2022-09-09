@@ -9,12 +9,15 @@ Authors: 		Nick Livingston (old KIPR Link version), Duc Dang (new KIPR Wombat ve
 Date:			August 2022
 */
 
+
 // *** Import Libraries *** //
-//#include <kipr/wombat.h> 					// KIPR Wombat native library
+
+#include <kipr/wombat.h> 					// KIPR Wombat native library
 #include <stdlib.h>	 						// library for general purpose functions
 #include <stdbool.h> 						// library for boolean support
 
 // *** Define PIN Address *** //
+
 #define RIGHT_IR_PIN 0 
 #define LEFT_IR_PIN 1
 #define RIGHT_PHOTO_PIN 2
@@ -29,6 +32,7 @@ Date:			August 2022
 #define LEFT_MOTOR_PIN 1 					// servos
 
 // *** Function Declarations *** //
+
 // CHECKS
 void read_sensors();							 // read all sensor values and save to global variables
 bool is_above_distance_threshold(int threshold); // return true if one and only one IR sensor is above the specified threshold
