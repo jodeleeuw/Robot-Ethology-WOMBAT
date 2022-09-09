@@ -12,8 +12,8 @@ Date:			August 2022
 // *** Import Libraries *** //
 
 // #include <kipr/wombat.h> // KIPR Wombat native library
-#include <stdlib.h>		 // library for general purpose functions
-#include <stdbool.h>	 // library for boolean support
+#include <stdlib.h>	 // library for general purpose functions
+#include <stdbool.h> // library for boolean support
 
 // *** Define PIN Address *** //
 
@@ -59,11 +59,11 @@ float map(float value, float start_range_low, float start_range_high, float targ
 // remap a value from a source range to a new range
 
 // BUILT-IN FUNCTIONS
-void enable_servo(int pin);							// enable servo at the specified pin
-int analog_et(int pin);								// get the 10-bit analog value of a sensor on the specified pin
-int digital(int pin);								// get the digital value of a sensor on the specified pin
-unsigned long systime();							// get the system time
-void set_servo_position(int pin, int position);		// set a servo at the specified pin to the specified position
+void enable_servo(int pin);						// enable servo at the specified pin
+int analog_et(int pin);							// get the 10-bit analog value of a sensor on the specified pin
+int digital(int pin);							// get the digital value of a sensor on the specified pin
+unsigned long systime();						// get the system time
+void set_servo_position(int pin, int position); // set a servo at the specified pin to the specified position
 
 // *** Variable Definitions *** //
 
