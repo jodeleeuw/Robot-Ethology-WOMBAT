@@ -66,6 +66,13 @@ bool timer_elapsed(); // return true if our timer has elapsed
 float map(float value, float start_range_low, float start_range_high, float target_range_low, float target_range_high);
 // remap a value from a source range to a new range
 
+// BUILT-IN FUNCTIONS
+void enable_servo(int pin);						// enable servo at the specified pin
+int analog_et(int pin);							// get the 10-bit analog value of a sensor on the specified pin
+int digital(int pin);							// get the digital value of a sensor on the specified pin
+unsigned long systime();						// get the system time
+void set_servo_position(int pin, int position); // set a servo at the specified pin to the specified position
+
 // *** Variable Definitions *** //
 
 /* ### DEFINE GLOBAL VARIABLES UNDER THIS COMMENT BLOCK ### */
