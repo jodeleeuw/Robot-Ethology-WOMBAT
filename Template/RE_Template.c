@@ -25,10 +25,10 @@ i.e. This program operates a KIPR-Wombat-based robot (equipped with analog photo
 
 // *** Define PIN Address *** //
 
-#define RIGHT_IR_PIN 0
-#define LEFT_IR_PIN 1
-#define RIGHT_PHOTO_PIN 2
-#define LEFT_PHOTO_PIN 3 // analog sensors (IRs, photos)
+#define RIGHT_PHOTO_PIN 0
+#define LEFT_PHOTO_PIN 1
+#define RIGHT_IR_PIN 2
+#define LEFT_IR_PIN 3 // analog sensors (IRs, photos)
 
 #define FRONT_BUMP_RIGHT_PIN 0
 #define FRONT_BUMP_LEFT_PIN 1
