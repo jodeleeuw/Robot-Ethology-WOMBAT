@@ -1,5 +1,5 @@
 /*
-Vassar Cognitive Science - Robot Novel Behavior (Plain version)
+Vassar Cognitive Science - Robot Novel Behavior (GUI version)
 
 This program operates a kipr-wombat-based robot (equipped with analog photo, ir, contact sensors) with a specified subsumption hierarchy.
 
