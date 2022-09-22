@@ -17,15 +17,15 @@ Date:			August 2022
 
 // *** Define PIN Address *** //
 
-#define RIGHT_PHOTO_PIN 0
-#define LEFT_PHOTO_PIN 1
-#define RIGHT_IR_PIN 2
-#define LEFT_IR_PIN 3 // analog sensors (IRs, photos)
+#define RIGHT_IR_PIN 0
+#define LEFT_IR_PIN 1
+#define RIGHT_PHOTO_PIN 2
+#define LEFT_PHOTO_PIN 3 // analog sensors (IRs, photos)
 
-#define FRONT_BUMP_RIGHT_PIN 0
-#define FRONT_BUMP_LEFT_PIN 1
-#define BACK_BUMP_RIGHT_PIN 2
-#define BACK_BUMP_LEFT_PIN 3 // digital sensors (bumpers)
+#define FRONT_BUMP_CENTER_PIN 2
+#define FRONT_BUMP_SIDE_PIN 3
+#define BACK_BUMP_CENTER_PIN 0
+#define BACK_BUMP_SIDE_PIN 1 // digital sensors (bumpers)
 
 #define RIGHT_MOTOR_PIN 0
 #define LEFT_MOTOR_PIN 1 // servos
@@ -68,7 +68,7 @@ void set_servo_position(int pin, int position); // set a servo at the specified 
 // *** Variable Definitions *** //
 
 // global variables to store all current sensor values accessible to all functions and updated by the "read_sensors" function
-int right_photo_value, left_photo_value, right_ir_value, left_ir_value, front_bump_right_value, front_bump_left_value, back_bump_right_value, back_bump_left_value;
+int right_photo_value, left_photo_value, right_ir_value, left_ir_value, front_bump_center_value, front_bump_side_value, back_bump_center_value, back_bump_side_value;
 
 // threshold values
 int avoid_threshold = 1600;	   // the absolute difference between IR readings has to be above this for the avoid action
@@ -98,7 +98,7 @@ Here, we define new kind of variable type called "behavior" that contains proper
 */
 typedef struct behavior
 {
-	const char *title;
+	const char* title;
 	int type;
 	int rank;
 	bool is_active;
@@ -119,7 +119,7 @@ struct behavior subsumption_hierarchy[] = {
 	{"CRUISE STRAIGHT", CRUISE_S_TYPE, 0, true},
 	{"SEEK DARK", SEEK_DARK_TYPE, 0, false},
 	{"APPROACH", APPROACH_TYPE, 0, false},
-	{"CRUISE ARC", CRUISE_A_TYPE, 0, false}};
+	{"CRUISE ARC", CRUISE_A_TYPE, 0, false} };
 
 
 /*
@@ -136,16 +136,16 @@ bool update_operating_console = false; // a boolean to tell us when to update th
 This comparator function is used in the qsort function for sorting our behavior list.
 Active things always go before inactive things, and if both are active then the are ordered by rank.
 */
-int compare_ranks(const void *a, const void *b)
+int compare_ranks(const void* a, const void* b)
 {
-	bool is_active_a = ((struct behavior *)a)->is_active;
-	bool is_active_b = ((struct behavior *)b)->is_active;
+	bool is_active_a = ((struct behavior*)a)->is_active;
+	bool is_active_b = ((struct behavior*)b)->is_active;
 	if (is_active_a != is_active_b)
 	{
 		return is_active_b;
 	}
-	int rank_a = ((struct behavior *)a)->rank;
-	int rank_b = ((struct behavior *)b)->rank;
+	int rank_a = ((struct behavior*)a)->rank;
+	int rank_b = ((struct behavior*)b)->rank;
 	return (rank_a - rank_b);
 }
 
@@ -264,7 +264,7 @@ void randomize_hierarchy()
 }
 
 /* MANAGE SCREEN PRINTING OF GUI */
-void print_subsumption_hierarchy(struct behavior *array, size_t len)
+void print_subsumption_hierarchy(struct behavior* array, size_t len)
 {
 	size_t i;
 	for (i = 0; i < len; i++)
@@ -392,25 +392,25 @@ int main()
 							execute_action = true;
 							cruise_arc();
 							break;
-						} 
-					}	  
+						}
+					}
 					if (execute_action)
 					{
 						break; // if any action was executed, break out of the subsumption hierarchy loop altogether
-					}		   
+					}
 					else
 					{
 						stop(); // if there is no action, stop
 					}
-				} 
-			}	  
-		}		  
+				}
+			}
+		}
 
 		else
 		{
 			disable_servos(); // disable all servo motors if we are in gui mode
 		}
-	} 
+	}
 	return 0; // due to infinite while loop, we will never get here
 }
 
@@ -424,10 +424,11 @@ void read_sensors()
 	left_photo_value = analog_et(LEFT_PHOTO_PIN);			// read the photo sensor at LEFT_PHOTO_PIN; *** NOTE: greater value means less light ***
 	right_ir_value = analog_et(RIGHT_IR_PIN);				// read the IR sensor at RIGHT_IR_PIN
 	left_ir_value = analog_et(LEFT_IR_PIN);					// read the IR sensor at LEFT_IR_PIN
-	front_bump_right_value = digital(FRONT_BUMP_RIGHT_PIN); // read the bumper at FRONT_BUMP_RIGHT_PIN
-	front_bump_left_value = digital(FRONT_BUMP_LEFT_PIN);	// read the bumper at FRONT_BUMP_LEFT_PIN
-	back_bump_right_value = digital(BACK_BUMP_RIGHT_PIN);	// read the bumper at BACK_BUMP_RIGHT_PIN
-	back_bump_left_value = digital(BACK_BUMP_LEFT_PIN);		// read the bumper at BACK_BUMP_LEFT_PIN'
+	// read bumpers
+	front_bump_center_value = digital(FRONT_BUMP_CENTER_PIN); 
+	front_bump_side_value = digital(FRONT_BUMP_SIDE_PIN);	
+	back_bump_center_value = digital(BACK_BUMP_CENTER_PIN);	
+	back_bump_side_value = digital(BACK_BUMP_SIDE_PIN);		
 }
 
 bool is_above_photo_differential(int threshold)
@@ -444,12 +445,12 @@ bool is_above_distance_threshold(int threshold)
 
 bool is_front_bump()
 {
-	return (front_bump_left_value == 0 || front_bump_right_value == 0); // return true if one of the front bump values is 0, otherwise false
+	return (front_bump_center_value == 1 || front_bump_side_value == 1); // return true if one of the front bump values is 1, otherwise false
 }
 
 bool is_back_bump()
 {
-	return (back_bump_left_value == 0 || back_bump_right_value == 0); // return true if one of the back bump values is 0, otherwise false
+	return (back_bump_center_value == 1 || back_bump_side_value == 1); // return true if one of the back bump values is 1, otherwise false
 }
 
 //====================================//
@@ -488,26 +489,12 @@ void stop()
 
 void escape_front()
 {
-	if (front_bump_left_value == 0)
-	{
-		drive(-0.1, -0.90, 1);
-	}
-	else if (front_bump_right_value == 0)
-	{
-		drive(-0.90, -0.0, 1);
-	}
+	drive(-0.2, -0.9, 3); //drive backwards in an arc
 }
 
 void escape_back()
 {
-	if (back_bump_left_value == 0)
-	{
-		drive(0.9, 0.10, 1);
-	}
-	else if (back_bump_right_value == 0)
-	{
-		drive(0.10, 0.9, 1);
-	}
+	drive(0.9, 0.9, 1); //drive forward a little
 }
 
 void seek_light()
