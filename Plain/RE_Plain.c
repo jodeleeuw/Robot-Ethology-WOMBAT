@@ -209,30 +209,30 @@ void escape_back()
 
 void seek_light()
 {
-	float left_servo;
-	float right_servo;
+	// greater photo_value means less light
 	int photo_difference = right_photo_value - left_photo_value;
-	if (abs(photo_difference) > photo_threshold)
-	{
-		int multiplier = (photo_difference > 0) ? 1 : -1;
-		right_servo = 0.2 * multiplier;
-		left_servo = -right_servo;
+	// positive photo_difference means left sensor is brighter
+	if (photo_difference > 0){
+		drive(-0.2, 0.2, 0.25);
 	}
-	drive(left_servo, right_servo, 0.25);
+	// negative photo_difference means right sensor is brighter
+	if (photo_difference < 0){
+		drive(0.2, -0.2, 0.25);
+	}
 }
 
 void seek_dark()
 {
-	float left_servo;
-	float right_servo;
+	// greater photo_value means less light
 	int photo_difference = right_photo_value - left_photo_value;
-	if (abs(photo_difference) > photo_threshold)
-	{
-		int multiplier = (photo_difference > 1) ? -1 : 1;
-		right_servo = 0.2 * multiplier;
-		left_servo = -right_servo;
+	// positive photo_difference means left sensor is brighter
+	if (photo_difference > 0){
+		drive(0.2, -0.2, 0.25);
 	}
-	drive(left_servo, right_servo, 0.25);
+	// negative photo_difference means right sensor is brighter
+	if (photo_difference < 0){
+		drive(-0.2, 0.2, 0.25);
+	}
 }
 
 void avoid()
