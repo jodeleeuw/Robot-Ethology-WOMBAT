@@ -188,12 +188,12 @@ void drive(float left, float right, float delay_seconds)
 
 void cruise_straight()
 {
-	drive(0.50, 0.50, 0.5);
+	drive(0.50, 0.50, 0.05);
 }
 
 void cruise_arc()
 {
-	drive(0.25, 0.4, 0.5);
+	drive(0.25, 0.4, 0.05);
 }
 
 void stop()
