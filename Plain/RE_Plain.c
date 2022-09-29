@@ -22,10 +22,12 @@ Date:			August 2022
 #define RIGHT_PHOTO_PIN 2
 #define LEFT_PHOTO_PIN 3 // analog sensors (IRs, photos)
 
-#define FRONT_BUMP_CENTER_PIN 2
-#define FRONT_BUMP_SIDE_PIN 3
+#define FRONT_BUMP_LEFT_PIN 5
+#define FRONT_BUMP_CENTER_PIN 3
+#define FRONT_BUMP_RIGHT_PIN 4
+#define BACK_BUMP_LEFT_PIN 2
 #define BACK_BUMP_CENTER_PIN 0
-#define BACK_BUMP_SIDE_PIN 1 // digital sensors (bumpers)
+#define BACK_BUMP_RIGHT_PIN 1
 
 #define RIGHT_MOTOR_PIN 0
 #define LEFT_MOTOR_PIN 1 // servos
@@ -68,7 +70,7 @@ void set_servo_position(int pin, int position); // set a servo at the specified 
 // *** Variable Definitions *** //
 
 // global variables to store all current sensor values accessible to all functions and updated by the "read_sensors" function
-int right_photo_value, left_photo_value, right_ir_value, left_ir_value, front_bump_center_value, front_bump_side_value, back_bump_center_value, back_bump_side_value;
+int right_photo_value, left_photo_value, right_ir_value, left_ir_value, front_bump_left_value, front_bump_center_value, front_bump_right_value, back_bump_left_value, back_bump_center_value, back_bump_right_value;
 
 // threshold values
 int avoid_threshold = 1600;	   // the absolute difference between IR readings has to be above this for the avoid action
@@ -135,10 +137,12 @@ void read_sensors()
 	right_ir_value = analog_et(RIGHT_IR_PIN);				// read the IR sensor at RIGHT_IR_PIN
 	left_ir_value = analog_et(LEFT_IR_PIN);					// read the IR sensor at LEFT_IR_PIN
 	// read the bumpers
-	front_bump_center_value = digital(FRONT_BUMP_CENTER_PIN); 
-	front_bump_side_value = digital(FRONT_BUMP_SIDE_PIN);	
-	back_bump_center_value = digital(BACK_BUMP_CENTER_PIN);	
-	back_bump_side_value = digital(BACK_BUMP_SIDE_PIN);		
+	front_bump_left_value = digital(FRONT_BUMP_LEFT_PIN);   // read the bumper at FRONT_BUMP_LEFT_PIN
+	front_bump_center_value = digital(FRONT_BUMP_CENTER_PIN); // read the bumper at FRONT_BUMP_CENTER_PIN
+	front_bump_right_value = digital(FRONT_BUMP_RIGHT_PIN);  // read the bumper at FRONT_BUMP_RIGHT_PIN
+	back_bump_left_value = digital(BACK_BUMP_LEFT_PIN);	// read the bumper at BACK_BUMP_LEFT_PIN
+	back_bump_center_value = digital(BACK_BUMP_CENTER_PIN);  // read the bumper at BACK_BUMP_CENTER_PIN
+	back_bump_right_value = digital(BACK_BUMP_RIGHT_PIN);	// read the bumper at BACK_BUMP_RIGHT_PIN	
 }
 
 bool is_above_photo_differential(int threshold)
@@ -155,12 +159,12 @@ bool is_above_distance_threshold(int threshold)
 
 bool is_front_bump()
 {
-	return (front_bump_center_value == 1 || front_bump_side_value == 1); // return true if one of the front bump values is 1, otherwise false
+	return (front_bump_left_value == 1 || front_bump_center_value == 1 || front_bump_right_value == 1); // return true if one of the front bump values is 1, otherwise false
 }
 
 bool is_back_bump()
 {
-	return (back_bump_center_value == 1 || back_bump_side_value == 1); // return true if one of the back bump values is 1, otherwise false
+	return (back_bump_left_value == 1 || back_bump_center_value == 1 || back_bump_right_value == 1); // return true if one of the back bump values is 1, otherwise false
 }
 
 //====================================//
