@@ -75,7 +75,7 @@ int right_photo_value, left_photo_value, right_ir_value, left_ir_value, front_bu
 // threshold values
 int avoid_threshold = 1600;	   // the absolute difference between IR readings has to be above this for the avoid action
 int approach_threshold = 1600; // the absolute difference between IR readings has to be below this for the approach action
-int photo_threshold = 150;	   // the absolute difference between photo sensor readings has to be above this for seek light/dark actions
+int photo_threshold = 200;	   // the absolute difference between photo sensor readings has to be above this for seek light/dark actions
 
 // timer
 int timer_duration = 500;	  // the time in milliseconds to wait between calling action commands, changed by each drive command called by actions
